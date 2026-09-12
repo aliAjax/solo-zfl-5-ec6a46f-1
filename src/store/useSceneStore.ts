@@ -6,7 +6,6 @@ import {
   deleteScene as storageDeleteScene,
   getScenesByRoute,
   getAllRouteNames,
-  getRandomScene,
 } from '@/services/storage'
 
 interface SceneState {
@@ -23,6 +22,16 @@ interface SceneState {
   refreshRandom: () => void
 }
 
+const byTimeDesc = (a: WindowScene, b: WindowScene) =>
+  new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+
+// 空线路名表示“全部”，此时展示所有记录（按时间倒序）
+function scenesForRoute(routeName: string): WindowScene[] {
+  return routeName
+    ? getScenesByRoute(routeName)
+    : getAllScenes().sort(byTimeDesc)
+}
+
 export const useSceneStore = create<SceneState>((set) => ({
   scenes: [],
   routeNames: [],
@@ -33,7 +42,11 @@ export const useSceneStore = create<SceneState>((set) => ({
   loadAll: () => {
     const scenes = getAllScenes()
     const routeNames = getAllRouteNames()
-    set({ scenes, routeNames })
+    set((state) => ({
+      scenes,
+      routeNames,
+      currentRouteScenes: scenesForRoute(state.selectedRoute),
+    }))
   },
 
   saveScene: (data: SceneFormData) => {
@@ -45,31 +58,39 @@ export const useSceneStore = create<SceneState>((set) => ({
     storageSaveScene(scene)
     const scenes = getAllScenes()
     const routeNames = getAllRouteNames()
-    set((state) => {
-      const currentRouteScenes =
-        state.selectedRoute ? getScenesByRoute(state.selectedRoute) : []
-      return { scenes, routeNames, currentRouteScenes }
-    })
+    set((state) => ({
+      scenes,
+      routeNames,
+      currentRouteScenes: scenesForRoute(state.selectedRoute),
+    }))
   },
 
   deleteScene: (id: string) => {
     storageDeleteScene(id)
     const scenes = getAllScenes()
     const routeNames = getAllRouteNames()
-    set((state) => {
-      const currentRouteScenes =
-        state.selectedRoute ? getScenesByRoute(state.selectedRoute) : []
-      return { scenes, routeNames, currentRouteScenes }
-    })
+    set((state) => ({
+      scenes,
+      routeNames,
+      currentRouteScenes: scenesForRoute(state.selectedRoute),
+      // 被移除的记录不能继续留在灵感页
+      randomScene: state.randomScene?.id === id ? null : state.randomScene,
+    }))
   },
 
   selectRoute: (routeName: string) => {
-    const currentRouteScenes = routeName ? getScenesByRoute(routeName) : []
-    set({ selectedRoute: routeName, currentRouteScenes })
+    set({ selectedRoute: routeName, currentRouteScenes: scenesForRoute(routeName) })
   },
 
   refreshRandom: () => {
-    const randomScene = getRandomScene()
-    set({ randomScene })
+    set((state) => {
+      // 多于一条时避免连续抽到同一条
+      const pool =
+        state.randomScene && state.scenes.length > 1
+          ? state.scenes.filter((s) => s.id !== state.randomScene!.id)
+          : state.scenes
+      if (pool.length === 0) return { randomScene: null }
+      return { randomScene: pool[Math.floor(Math.random() * pool.length)] }
+    })
   },
 }))

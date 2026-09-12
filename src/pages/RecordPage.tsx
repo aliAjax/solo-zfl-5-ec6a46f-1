@@ -50,7 +50,7 @@ export default function RecordPage() {
     <div className="relative min-h-screen bg-teal-950 p-4 pb-24">
       {showSuccess && (
         <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
-          <div className="animate-bounce flex flex-col items-center gap-2 opacity-0" style={{ animation: 'fadeInUp 1.5s ease forwards' }}>
+          <div className="flex flex-col items-center gap-2 opacity-0" style={{ animation: 'fadeInUp 1.5s ease forwards' }}>
             <Bus className="w-16 h-16 text-dusk-400" />
             <span className="text-mist-100 font-serif text-lg">记录已保存</span>
           </div>
@@ -71,11 +71,11 @@ export default function RecordPage() {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="text-mist-300 text-xs mb-1 flex items-center gap-1"><Bus className="w-3 h-3" />线路</label>
-              <input className="w-full bg-teal-850 text-mist-100 rounded-xl px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-dusk-400" value={form.routeName} onChange={(e) => update('routeName', e.target.value)} required />
+              <input className="w-full bg-teal-850 text-mist-100 rounded-xl px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-dusk-400 placeholder:text-mist-500" placeholder="如：27路" value={form.routeName} onChange={(e) => update('routeName', e.target.value)} required />
             </div>
             <div>
               <label className="text-mist-300 text-xs mb-1 flex items-center gap-1"><MapPin className="w-3 h-3" />区间</label>
-              <input className="w-full bg-teal-850 text-mist-100 rounded-xl px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-dusk-400" value={form.segment} onChange={(e) => update('segment', e.target.value)} required />
+              <input className="w-full bg-teal-850 text-mist-100 rounded-xl px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-dusk-400 placeholder:text-mist-500" placeholder="如：钟楼 → 大差市" value={form.segment} onChange={(e) => update('segment', e.target.value)} required />
             </div>
           </div>
           <div>
@@ -108,7 +108,7 @@ export default function RecordPage() {
           </div>
           <div>
             <label className="text-mist-300 text-xs mb-1 flex items-center gap-1"><Signpost className="w-3 h-3" />招牌文字</label>
-            <input className="w-full bg-teal-850 text-mist-100 rounded-xl px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-dusk-400" value={form.signText} onChange={(e) => update('signText', e.target.value)} />
+            <input className="w-full bg-teal-850 text-mist-100 rounded-xl px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-dusk-400 placeholder:text-mist-500" placeholder="掠过眼前的店招，可留空" value={form.signText} onChange={(e) => update('signText', e.target.value)} />
           </div>
           <div>
             <label className="text-mist-300 text-xs mb-1 flex items-center gap-1"><TreePine className="w-3 h-3" />树木密度</label>
@@ -138,7 +138,7 @@ export default function RecordPage() {
           <h2 className="text-dusk-400 font-serif text-lg flex items-center gap-2">
             <FileText className="w-4 h-4" />观察笔记
           </h2>
-          <textarea className="w-full bg-teal-850 text-mist-100 rounded-xl px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-dusk-400 resize-none h-24" value={form.note} onChange={(e) => update('note', e.target.value)} />
+          <textarea className="w-full bg-teal-850 text-mist-100 rounded-xl px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-dusk-400 placeholder:text-mist-500 resize-none h-24" placeholder="一句此刻的观察，例如：雨刷刚停，对面理发店的转灯在积水里晃。" value={form.note} onChange={(e) => update('note', e.target.value)} required />
         </section>
 
         <div className="flex items-center gap-2 text-mist-400 text-xs">

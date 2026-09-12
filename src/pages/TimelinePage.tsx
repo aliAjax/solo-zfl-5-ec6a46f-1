@@ -83,8 +83,9 @@ export default function TimelinePage() {
           <div className="flex flex-col items-center justify-center py-24 text-mist-400">
             <div className="mb-4 text-6xl opacity-30">🪟</div>
             <p className="text-lg">
-              {selectedRoute ? '该路线暂无窗景记录' : '选择一条路线，开始浏览窗景'}
+              {selectedRoute ? `「${selectedRoute}」暂无窗景记录` : '还没有窗景记录'}
             </p>
+            <p className="mt-1 text-sm text-mist-500">去记录页写下第一段车窗外的风景吧</p>
           </div>
         ) : (
           <div className="relative pl-8">
@@ -93,9 +94,12 @@ export default function TimelinePage() {
               {sorted.map((scene) => (
                 <div key={scene.id} className="relative flex gap-4">
                   <div className="absolute -left-5 top-1 h-2.5 w-2.5 rounded-full bg-dusk-400 ring-4 ring-teal-950" />
-                  <div className="w-20 shrink-0 pt-0.5 text-right">
+                  <div className="w-16 shrink-0 pt-0.5 text-right">
                     <p className="text-xs text-dusk-400">
-                      {formatTimestamp(scene.timestamp)}
+                      {formatTimestamp(scene.timestamp).split(' ')[0].slice(5)}
+                    </p>
+                    <p className="text-xs text-dusk-400">
+                      {formatTimestamp(scene.timestamp).split(' ')[1]}
                     </p>
                     <p className="mt-0.5 text-[10px] text-mist-500">
                       {getTimeOfDay(scene.timestamp)}

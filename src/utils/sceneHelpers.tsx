@@ -1,4 +1,4 @@
-import type { Weather, TreeDensity, PedestrianStatus } from '@/types'
+import type { WindowScene, Weather, TreeDensity, PedestrianStatus } from '@/types'
 import {
   Sun, Cloud, CloudRain, CloudDrizzle, CloudSnow, CloudFog,
   TreePine, TreePine as TreeSparse, Trees,
@@ -57,17 +57,53 @@ export function getTimeOfDay(iso: string): string {
   return '夜晚'
 }
 
-export const WRITING_PROMPTS = [
-  '尝试以窗外招牌为线索，写一个关于陌生人的短篇',
-  '用树木的密度变化暗示主人公的心境转折',
-  '让行人的状态成为故事中某个预兆的隐喻',
-  '把天气当作叙事节奏的调节器，写一段场景转换',
-  '以座位方向为视角限制，写一段只看到一侧世界的独白',
-  '从观察笔记中的一句话出发，展开一篇城市散文',
-  '将窗景中所有招牌串联成一条线索，写一个悬疑片段',
-  '用行人的姿态写一首自由诗',
-  '以"窗外"为题，把这段记录扩写成五百字的微型小说',
-  '从树木间隙中想象一个被遮挡的完整故事',
-  '用天气和行人密度写一段氛围描写',
-  '把窗景当作一幅画，为它写一段策展词',
-]
+// 写作提示按记录字段生成：天气 / 招牌 / 树木密度 / 行人状态各有一组句式，
+// 每次抽取时随机组合两个方面，同一条记录重抽也会得到不同的提示。
+const WEATHER_PROMPTS: Record<Weather, string[]> = {
+  '晴': ['把阳光写成一个沉默的在场者，它看见了什么', '让光线在段落之间移动，标记时间的流逝'],
+  '多云': ['让云层的厚薄对应人物情绪的起伏', '写一段光线犹豫不决的路途'],
+  '阴': ['用低垂的天色压住对话的音量', '让阴天成为人物回避某个话题的理由'],
+  '小雨': ['让雨声决定段落的节奏与停顿', '写一个在雨里放慢脚步的人，他在回避什么'],
+  '大雨': ['让一场暴雨打断一句重要的对话', '把大雨写成把城市冲出另一副面孔的力量'],
+  '雪': ['让雪吸走所有声音，写一段近乎无声的相遇', '用初雪覆盖熟悉的街道，写出陌生感'],
+  '雾': ['让雾气藏起一个关键细节，到结尾才显现', '写在雾里只听得见声音的一小段路'],
+}
+
+const TREE_PROMPTS: Record<TreeDensity, string[]> = {
+  '稀疏': ['让稀疏的树影之间，露出人物刻意保持的距离'],
+  '适中': ['用行道树的间隔，丈量人物若即若离的关系'],
+  '茂密': ['让浓密的树冠，遮住一句没说出口的话'],
+}
+
+const PEDESTRIAN_PROMPTS: Record<PedestrianStatus, string[]> = {
+  '稀少': ['把空荡的人行道写成一种等待'],
+  '零星': ['让零星的路人，各自携带一个不相干的秘密'],
+  '密集': ['在拥挤的人潮里，安排一次只有一个人察觉的回望'],
+}
+
+function signPrompts(signText: string): string[] {
+  return [
+    `以「${signText}」的招牌为线索，牵出一个陌生人的故事`,
+    `想象「${signText}」打烊之后，店里发生的事`,
+    `让主人公在「${signText}」的灯箱下，做一个犹豫已久的决定`,
+  ]
+}
+
+const pickOne = <T,>(pool: T[]): T => pool[Math.floor(Math.random() * pool.length)]
+
+export function generateWritingPrompt(scene: WindowScene): string {
+  const aspectPools = [
+    WEATHER_PROMPTS[scene.weather],
+    TREE_PROMPTS[scene.treeDensity],
+    PEDESTRIAN_PROMPTS[scene.pedestrianStatus],
+  ]
+  const sign = scene.signText.trim()
+  if (sign) {
+    // 招牌是最具体的线索，有招牌时一定带上，再从其余方面随机配一个
+    return [pickOne(signPrompts(sign)), pickOne(pickOne(aspectPools))].join('；')
+  }
+  // 无招牌时从三个方面里不重复地随机取两个
+  const first = Math.floor(Math.random() * aspectPools.length)
+  const second = (first + 1 + Math.floor(Math.random() * (aspectPools.length - 1))) % aspectPools.length
+  return [pickOne(aspectPools[first]), pickOne(aspectPools[second])].join('；')
+}

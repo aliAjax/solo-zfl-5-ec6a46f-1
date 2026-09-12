@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useSceneStore } from '@/store/useSceneStore'
 import {
-  WRITING_PROMPTS,
+  generateWritingPrompt,
   getWeatherIcon,
   getTreeIcon,
   getPedestrianIcon,
@@ -23,11 +23,10 @@ export default function InspirePage() {
 
   useEffect(() => {
     if (!revealed || !randomScene) return
-    const idx = Math.floor(Math.random() * WRITING_PROMPTS.length)
     setDisplayedPrompt('')
     setIsTyping(true)
 
-    const fullText = WRITING_PROMPTS[idx]
+    const fullText = generateWritingPrompt(randomScene)
     let charIdx = 0
     const timer = setInterval(() => {
       charIdx++

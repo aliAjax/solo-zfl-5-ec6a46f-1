@@ -160,7 +160,10 @@ export default function TimelinePage() {
             </button>
 
             <div className="mb-4 flex items-center gap-3">
-              {getWeatherIcon(detailScene.weather)}
+              <span className="flex items-center gap-1.5 rounded-full bg-teal-800/60 px-2.5 py-1 text-xs text-mist-200">
+                {getWeatherIcon(detailScene.weather)}
+                {detailScene.weather}
+              </span>
               <h2 className="text-xl font-bold text-dusk-400">{detailScene.segment}</h2>
             </div>
 
